@@ -81,6 +81,14 @@
     margin-top: 24px;
     color: #b6a4f5;
   }
+  .status-msg {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 15px;
+    display: none;
+  }
+  .status-msg.success { color: #7ee787; }
+  .status-msg.error { color: #ff6b6b; }
 </style>
 </head>
 <body>
@@ -95,27 +103,53 @@
 <div class="container">
   <h1>📩 Contact Me 📩</h1>
 
-  <form id="contactForm">
+  <form id="contactForm" action="https://formspree.io/f/mrpzaarq" method="POST">
     <label for="name">Name</label>
-    <input type="text" id="name" placeholder="Your name" required>
+    <input type="text" id="name" name="name" placeholder="Your name" required>
 
     <label for="email">Email</label>
-    <input type="email" id="email" placeholder="you@example.com" required>
+    <input type="email" id="email" name="email" placeholder="you@example.com" required>
 
     <label for="message">Message</label>
-    <textarea id="message" placeholder="Type your message here..." required></textarea>
+    <textarea id="message" name="message" placeholder="Type your message here..." required></textarea>
 
     <button type="submit">Send Message</button>
+    <p id="statusMsg" class="status-msg"></p>
   </form>
 
   <a href="index.html" class="back-link">&larr; Back to Home</a>
 </div>
 
 <script>
-  document.getElementById('contactForm').addEventListener('submit', function (e) {
+  const form = document.getElementById('contactForm');
+  const statusMsg = document.getElementById('statusMsg');
+
+  form.addEventListener('submit', function (e) {
     e.preventDefault();
-    alert('Message sent! (demo only)');
-    this.reset();
+    const data = new FormData(form);
+
+    fetch(form.action, {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(response => {
+      if (response.ok) {
+        statusMsg.textContent = "Message sent! I'll get back to you soon.";
+        statusMsg.className = 'status-msg success';
+        statusMsg.style.display = 'block';
+        form.reset();
+      } else {
+        statusMsg.textContent = "Something went wrong. Please try again.";
+        statusMsg.className = 'status-msg error';
+        statusMsg.style.display = 'block';
+      }
+    })
+    .catch(() => {
+      statusMsg.textContent = "Something went wrong. Please try again.";
+      statusMsg.className = 'status-msg error';
+      statusMsg.style.display = 'block';
+    });
   });
 </script>
 
